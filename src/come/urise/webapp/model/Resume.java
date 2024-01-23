@@ -1,8 +1,9 @@
+package come.urise.webapp.model;
+
 public class Resume {
 
     // Unique identifier
-    String uuid;
-
+    public String uuid;
     @Override
     public String toString() {
         return uuid;
