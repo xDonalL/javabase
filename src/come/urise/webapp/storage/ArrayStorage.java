@@ -4,11 +4,7 @@ import come.urise.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public class ArrayStorage implements Storage {
-    private static final int LIMIT_STORAGE = 10000;
-    private Resume[] storage = new Resume[LIMIT_STORAGE];
-
-    private int size;
+public class ArrayStorage extends AbstractArrayStorage {
 
     public void clear() {
         Arrays.fill(storage, 0, size, null);
@@ -63,11 +59,7 @@ public class ArrayStorage implements Storage {
         return resumes;
     }
 
-    public int size() {
-        return size;
-    }
-
-    private int getIndex(String uuid) {
+    protected int getIndex(String uuid) {
         for (int i = 0; i < size; i++) {
             if (storage[i].getUuid().equals(uuid)) {
                 return i;
