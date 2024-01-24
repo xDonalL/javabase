@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Resume {
 
-    public String uuid;
+    private String uuid;
 
     @Override
     public String toString() {
@@ -22,5 +22,13 @@ public class Resume {
     @Override
     public int hashCode() {
         return Objects.hash(uuid);
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }
