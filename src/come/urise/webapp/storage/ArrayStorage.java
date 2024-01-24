@@ -2,21 +2,24 @@ package come.urise.webapp.storage;
 
 import come.urise.webapp.model.Resume;
 
+import java.util.Arrays;
+
 public class ArrayStorage {
-    Resume[] storage = new Resume[10000];
+    private static final int LIMIT_STORAGE = 10000;
+    private Resume[] storage = new Resume[LIMIT_STORAGE];
 
     private int size;
 
     public void clear() {
-        for (int i = 0; i < size(); i++) {
-            storage[i] = null;
-        }
+        Arrays.fill(storage, 0, size, null);
         size = 0;
     }
 
     public void save(Resume r) {
-        if (size == 10000 || getIndex(r.uuid) != -1) {
-            System.out.println("ERROR");
+        if (size >= LIMIT_STORAGE) {
+            System.out.println("Storage overflow");
+        } else if (getIndex(r.uuid) != -1) {
+            System.out.println("Resume " + r.uuid + " already exit");
         } else {
             storage[size] = r;
             size++;
@@ -26,7 +29,7 @@ public class ArrayStorage {
     public void update(Resume r) {
         int index = getIndex(r.uuid);
         if (index == -1) {
-            System.out.println("ERROR");
+            System.out.println("Resume does not exit");
         } else {
             storage[index] = r;
         }
@@ -52,9 +55,6 @@ public class ArrayStorage {
         }
     }
 
-    /**
-     * @return array, contains only Resumes in storage (without null)
-     */
     public Resume[] getAll() {
         Resume[] resumes = new Resume[size];
         for (int i = 0; i < size; i++) {
