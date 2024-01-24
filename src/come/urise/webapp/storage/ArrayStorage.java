@@ -4,7 +4,7 @@ import come.urise.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public class ArrayStorage {
+public class ArrayStorage implements Storage {
     private static final int LIMIT_STORAGE = 10000;
     private Resume[] storage = new Resume[LIMIT_STORAGE];
 
