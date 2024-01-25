@@ -2,7 +2,12 @@ package come.urise.webapp.model;
 
 import java.util.Objects;
 
-public class Resume {
+public class Resume implements Comparable<Resume>{
+
+    public Resume(String uuid) {
+        this.uuid = uuid;
+    }
+    public Resume(){}
 
     private String uuid;
 
@@ -30,5 +35,10 @@ public class Resume {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    @Override
+    public int compareTo(Resume o) {
+        return uuid.compareTo(o.uuid);
     }
 }

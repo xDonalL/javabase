@@ -2,61 +2,16 @@ package come.urise.webapp.storage;
 
 import come.urise.webapp.model.Resume;
 
-import java.util.Arrays;
-
 public class ArrayStorage extends AbstractArrayStorage {
 
-    public void clear() {
-        Arrays.fill(storage, 0, size, null);
-        size = 0;
+    @Override
+    protected void add(Resume resume, int index) {
+        storage[size] = resume;
     }
 
-    public void save(Resume r) {
-        if (size >= LIMIT_STORAGE) {
-            System.out.println("Storage overflow");
-        } else if (getIndex(r.getUuid()) != -1) {
-            System.out.println("Resume " + r.getUuid() + " already exit");
-        } else {
-            storage[size] = r;
-            size++;
-        }
-    }
-
-    public void update(Resume r) {
-        int index = getIndex(r.getUuid());
-        if (index == -1) {
-            System.out.println("Resume does not exist");
-        } else {
-            storage[index] = r;
-        }
-    }
-
-    public Resume get(String uuid) {
-        int index = getIndex(uuid);
-        if (index == -1) {
-            System.out.println("Resume does not exist");
-            return null;
-        }
-        return storage[index];
-    }
-
-    public void delete(String uuid) {
-        int index = getIndex(uuid);
-        if (index == -1) {
-            System.out.println("Resume does not exist");
-        } else {
-            storage[index] = storage[size - 1];
-            storage[size - 1] = null;
-            size--;
-        }
-    }
-
-    public Resume[] getAll() {
-        Resume[] resumes = new Resume[size];
-        for (int i = 0; i < size; i++) {
-            resumes[i] = storage[i];
-        }
-        return resumes;
+    @Override
+    protected void remove(int index) {
+        storage[index] = storage[size - 1];
     }
 
     protected int getIndex(String uuid) {
