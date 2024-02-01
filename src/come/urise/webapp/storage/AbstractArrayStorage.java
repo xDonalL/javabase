@@ -2,6 +2,7 @@ package come.urise.webapp.storage;
 
 import come.urise.webapp.exception.ExistStorageException;
 import come.urise.webapp.exception.NotExitStorageException;
+import come.urise.webapp.exception.StorageException;
 import come.urise.webapp.model.Resume;
 
 import java.util.Arrays;
@@ -34,7 +35,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public void save(Resume resume) {
         int index = getIndex(resume.getUuid());
         if (size >= LIMIT_STORAGE) {
-            System.out.println("Storage overflow");
+            throw new StorageException( "Storage is overflow", resume.getUuid());
         } else if (index >= 0) {
             throw new ExistStorageException(resume.getUuid());
         } else {
