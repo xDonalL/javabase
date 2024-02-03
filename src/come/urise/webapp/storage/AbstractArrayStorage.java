@@ -1,75 +1,64 @@
 package come.urise.webapp.storage;
 
-import come.urise.webapp.exception.ExistStorageException;
-import come.urise.webapp.exception.NotExitStorageException;
 import come.urise.webapp.exception.StorageException;
 import come.urise.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage implements Storage {
+public abstract class AbstractArrayStorage extends AbstractStorage {
+    protected int size;
     protected static final int LIMIT_STORAGE = 10000;
     protected Resume[] storage = new Resume[LIMIT_STORAGE];
 
-    protected int size;
-
-    public Resume get(String uuid) {
-        int index = getIndex(uuid);
-        if (index < 0) {
-            throw new NotExitStorageException(uuid);
-        }
-        return storage[index];
+    @Override
+    protected void doDelete(Object searchKey) {
+        remove((Integer) searchKey);
+        storage[size - 1] = null;
+        size--;
     }
 
-    public void delete(String uuid) {
-        int index = getIndex(uuid);
-        if (index < 0) {
-            throw new NotExitStorageException(uuid);
-        } else {
-            remove(index);
-            storage[size - 1] = null;
-            size--;
-        }
-    }
-
-    public void save(Resume resume) {
-        int index = getIndex(resume.getUuid());
+    @Override
+    protected void doSave(Object searchKey, Resume resume) {
         if (size >= LIMIT_STORAGE) {
-            throw new StorageException( "Storage is overflow", resume.getUuid());
-        } else if (index >= 0) {
-            throw new ExistStorageException(resume.getUuid());
+            throw new StorageException("Storage is overflow", resume.getUuid());
         } else {
-            add(resume, index);
+            add(resume, (Integer) searchKey);
             size++;
         }
     }
 
-    public void update(Resume resume) {
-        int index = getIndex(resume.getUuid());
-        if (index < -1) {
-            throw new NotExitStorageException(resume.getUuid());
-        } else {
-            storage[index] = resume;
-        }
+    @Override
+    protected Resume doGet(Object searchKey) {
+        return storage[(Integer) searchKey];
     }
 
-    public Resume[] getAll() {
-        Resume[] resumes = Arrays.copyOf(storage, size);
-        return resumes;
+    @Override
+    protected void doUpdate(Object searchKey, Resume resume) {
+        storage[(Integer) searchKey] = resume;
     }
 
+    @Override
     public void clear() {
         Arrays.fill(storage, 0, size, null);
         size = 0;
+    }
+
+    @Override
+    public Resume[] getAll() {
+        return Arrays.copyOfRange(storage, 0, size);
     }
 
     public int size() {
         return size;
     }
 
-    protected abstract int getIndex(String uuid);
+    @Override
+    protected boolean isExit(Object key) {
+        return (Integer) key >= 0;
+    }
 
     protected abstract void add(Resume resume, int index);
 
     protected abstract void remove(int index);
+
 }

@@ -4,6 +4,10 @@ import come.urise.webapp.model.Resume;
 
 public class ArrayStorage extends AbstractArrayStorage {
 
+    public ArrayStorage() {
+        storage = new Resume[LIMIT_STORAGE];
+    }
+
     @Override
     protected void add(Resume resume, int index) {
         storage[size] = resume;
@@ -14,7 +18,7 @@ public class ArrayStorage extends AbstractArrayStorage {
         storage[index] = storage[size - 1];
     }
 
-    protected int getIndex(String uuid) {
+    protected Integer getSearchKey(String uuid) {
         for (int i = 0; i < size; i++) {
             if (storage[i].getUuid().equals(uuid)) {
                 return i;
