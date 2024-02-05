@@ -12,7 +12,7 @@ public class ListStorage extends AbstractStorage {
     @Override
     protected Integer getSearchKey(String uuid) {
         for (int i = 0; i < storage.size(); i++) {
-            if (storage.get(i).equals(uuid)) {
+            if (storage.get(i).getUuid().equals(uuid)) {
                 return i;
             }
         }
@@ -36,7 +36,7 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     protected void doDelete(Object searchKey) {
-        storage.remove((Integer) searchKey);
+        storage.remove((int) searchKey);
     }
 
     @Override

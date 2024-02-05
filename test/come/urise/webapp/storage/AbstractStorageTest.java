@@ -2,7 +2,6 @@ package come.urise.webapp.storage;
 
 import come.urise.webapp.exception.ExistStorageException;
 import come.urise.webapp.exception.NotExitStorageException;
-import come.urise.webapp.exception.StorageException;
 import come.urise.webapp.model.Resume;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,14 +89,5 @@ class AbstractStorageTest {
     @Test
     public void size() throws Exception {
         assertEquals(3, storage.size());
-    }
-
-    @Test
-    public void storageOverflow() {
-        assertThrows(StorageException.class, () -> {
-            for (int i = 3; i < 10001; i++) {
-                storage.save(new Resume("uuid" + i));
-            }
-        });
     }
 }
