@@ -2,6 +2,8 @@ package come.urise.webapp.storage;
 
 import come.urise.webapp.model.Resume;
 
+import java.util.List;
+
 public interface Storage {
 
     public void clear();
@@ -14,7 +16,7 @@ public interface Storage {
 
     public void delete(String uuid);
 
-    public Resume[] getAll();
+    public List<Resume> getAllSorted();
 
     public int size();
 }

@@ -15,7 +15,7 @@ class ArrayStorageTest extends AbstractStorageTest {
     public void storageOverflow() {
         assertThrows(StorageException.class, () -> {
             for (int i = 3; i < 10001; i++) {
-                storage.save(new Resume("uuid" + i));
+                storage.save(new Resume("uuid"+i));
             }
         });
     }

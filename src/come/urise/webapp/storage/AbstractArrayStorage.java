@@ -4,6 +4,7 @@ import come.urise.webapp.exception.StorageException;
 import come.urise.webapp.model.Resume;
 
 import java.util.Arrays;
+import java.util.List;
 
 public abstract class AbstractArrayStorage extends AbstractStorage {
     protected int size;
@@ -44,8 +45,11 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    public Resume[] getAll() {
-        return Arrays.copyOfRange(storage, 0, size);
+    public List<Resume> getAllSorted() {
+        Resume[] storageCopy = Arrays.copyOfRange(storage, 0, size);
+        List<Resume> storageList = Arrays.asList(storageCopy);
+        storageList.sort(SORT_BY_NAME);
+        return storageList;
     }
 
     public int size() {
