@@ -2,6 +2,7 @@ package come.urise.webapp.storage;
 
 import come.urise.webapp.model.Resume;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,8 @@ public class MapUuidStorage extends AbstractStorage {
 
     @Override
     public List<Resume> getAllSorted() {
-        List<Resume> storageCopy = storage.values().stream().toList();
+        List<Resume> storageCopy = new ArrayList<>(size());
+        storageCopy.addAll(storage.values());
         storageCopy.sort(SORT_BY_NAME);
         return storageCopy;
     }
