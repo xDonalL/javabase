@@ -13,22 +13,12 @@ public class MapUuidStorage extends AbstractStorage {
 
     @Override
     protected Object getSearchKey(String uuid) {
-        for (String key : storage.keySet()) {
-            if (key.equals(uuid)) {
-                return key;
-            }
-        }
         return uuid;
     }
 
     @Override
     protected boolean isExit(Object key) {
-        for (String k : storage.keySet()) {
-            if (key.equals(k)) {
-                return true;
-            }
-        }
-        return false;
+        return storage.containsKey(key);
     }
 
     @Override
