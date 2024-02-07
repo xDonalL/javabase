@@ -10,16 +10,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AbstractStorageTest {
+ class AbstractStorageTest {
     protected Storage storage;
     protected final String UUID_1 = "uuid1";
-    protected final Resume Resume1 = new Resume(UUID_1, "Name3");
+    protected final Resume Resume1 = new Resume(UUID_1, "New Name3");
     protected final String UUID_2 = "uuid2";
-    protected final Resume Resume2 = new Resume(UUID_2, "Name1");
+    protected final Resume Resume2 = new Resume(UUID_2, "New Name1");
     protected final String UUID_3 = "uuid3";
-    protected final Resume Resume3 = new Resume(UUID_3, "Name2");
+    protected final Resume Resume3 = new Resume(UUID_3, "New Name2");
     protected final String UUID_4 = "uuid4";
-    protected final Resume Resume4 = new Resume(UUID_4, "Name1");
+    protected final Resume Resume4 = new Resume(UUID_4, "New Name1");
 
     protected AbstractStorageTest(Storage storage) {
         this.storage = storage;
@@ -65,7 +65,7 @@ class AbstractStorageTest {
     @Test
     public void get() throws Exception {
         storage.get("uuid2");
-        assertEquals(UUID_2, "uuid2");
+        assertEquals("uuid2", UUID_2);
     }
 
     @Test
