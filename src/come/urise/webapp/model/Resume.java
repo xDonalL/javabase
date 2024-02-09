@@ -1,10 +1,27 @@
 package come.urise.webapp.model;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Objects;
 
 import static java.util.UUID.randomUUID;
 
-public class Resume implements Comparable<Resume>{
+public class Resume implements Comparable<Resume> {
+
+    private final String uuid;
+
+    private final String fullName;
+
+    private final Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
+    private final Map<SectionType, Section> sections = new EnumMap <> (SectionType.class);
+
+    public Map<ContactType, String> getContacts() {
+        return contacts;
+    }
+
+    public Map<SectionType, Section> getSections() {
+        return sections;
+    }
 
     public Resume(String uuid, String fullName) {
         Objects.requireNonNull(uuid);
@@ -18,9 +35,6 @@ public class Resume implements Comparable<Resume>{
         this.uuid = randomUUID().toString();
         this.fullName = fullName;
     }
-
-   private final String uuid;
-   private final String fullName;
 
     @Override
     public String toString() {
