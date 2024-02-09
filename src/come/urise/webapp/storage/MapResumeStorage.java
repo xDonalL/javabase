@@ -52,10 +52,9 @@ public class MapResumeStorage extends AbstractStorage<Resume> {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
-        List<Resume> storageCopy = new ArrayList<>(size());
-        storageCopy.addAll(storage.values());
-        storageCopy.sort(SORT_BY_NAME);
-        return storageCopy;
+    public List<Resume> doCopyAll() {
+        List<Resume> list = new ArrayList<>(storage.size());
+        list.addAll(storage.values());
+        return list;
     }
 }

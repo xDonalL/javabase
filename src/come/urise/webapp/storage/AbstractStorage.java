@@ -4,7 +4,7 @@ import come.urise.webapp.exception.ExistStorageException;
 import come.urise.webapp.exception.NotExitStorageException;
 import come.urise.webapp.model.Resume;
 
-import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Logger;
 
 public abstract class AbstractStorage<SK> implements Storage {
@@ -55,6 +55,22 @@ public abstract class AbstractStorage<SK> implements Storage {
         return searchKey;
     }
 
+    @Override
+    public List<Resume> getAllSorted() {
+        LOG.info("AllSorted");
+        List<Resume> list = doCopyAll();
+        list.sort((o1, o2) -> {
+            int result = o1.getFullName().compareTo(o2.getFullName());
+            if (result == 0) {
+                return o1.getUuid().compareTo(o2.getUuid());
+            }
+            return result;
+        });
+        return list;
+    }
+
+    protected abstract List<Resume> doCopyAll();
+
     protected abstract SK getSearchKey(String uuid);
 
     protected abstract boolean isExit(SK key);
@@ -66,12 +82,4 @@ public abstract class AbstractStorage<SK> implements Storage {
     protected abstract void doDelete(SK searchKey);
 
     protected abstract void doUpdate(SK searchKey, Resume resume);
-
-    protected static final Comparator<Resume> SORT_BY_NAME = (o1, o2) -> {
-        int result = o1.getFullName().compareTo(o2.getFullName());
-        if (result == 0) {
-            return o1.getUuid().compareTo(o2.getUuid());
-        }
-        return result;
-    };
 }
