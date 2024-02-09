@@ -5,27 +5,34 @@ import come.urise.webapp.exception.NotExitStorageException;
 import come.urise.webapp.model.Resume;
 
 import java.util.Comparator;
+import java.util.logging.Logger;
 
 public abstract class AbstractStorage<SK> implements Storage {
 
+    private static final Logger LOG = Logger.getLogger(AbstractStorage.class.getName());
+
     public Resume get(String uuid) {
+        LOG.info("Get " + uuid);
         SK searchKey = getNotExistedSearchKey(uuid);
         return doGet(searchKey);
     }
 
     public void update(Resume resume) {
+        LOG.info("Update " + resume);
         SK searchKey = getNotExistedSearchKey(resume.getUuid());
         doUpdate(searchKey, resume);
     }
 
     @Override
     public void save(Resume resume) {
+        LOG.info("Save " + resume);
         SK searchKey = getExistedSearchKey(resume.getUuid());
         doSave(searchKey, resume);
     }
 
     @Override
     public void delete(String uuid) {
+        LOG.info("Delete " + uuid);
         SK searchKey = getNotExistedSearchKey(uuid);
         doDelete(searchKey);
     }
@@ -33,6 +40,7 @@ public abstract class AbstractStorage<SK> implements Storage {
     private SK getExistedSearchKey(String uuid) {
         SK searchKey = getSearchKey(uuid);
         if (isExit(searchKey)) {
+            LOG.warning("Resume " + uuid + " already exist");
             throw new ExistStorageException(uuid);
         }
         return searchKey;
@@ -41,6 +49,7 @@ public abstract class AbstractStorage<SK> implements Storage {
     private SK getNotExistedSearchKey(String uuid) {
         SK searchKey = getSearchKey(uuid);
         if (!isExit(searchKey)) {
+            LOG.warning("Resume " + uuid + " not exist");
             throw new NotExitStorageException(uuid);
         }
         return searchKey;
