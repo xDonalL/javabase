@@ -2,15 +2,16 @@ package come.urise.webapp.storage;
 
 import come.urise.webapp.exception.ExistStorageException;
 import come.urise.webapp.exception.NotExitStorageException;
-import come.urise.webapp.model.Resume;
+import come.urise.webapp.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Month;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
- class AbstractStorageTest {
+class AbstractStorageTest {
     protected Storage storage;
     protected final String UUID_1 = "uuid1";
     protected final Resume Resume1 = new Resume(UUID_1, "New Name3");
@@ -31,6 +32,21 @@ import static org.junit.jupiter.api.Assertions.*;
         storage.save(Resume1);
         storage.save(Resume2);
         storage.save(Resume3);
+        Resume1.getContacts().put(ContactType.PHONE, "+79622229933");
+        Resume1.getContacts().put(ContactType.DISCORD, "@donal5962");
+        Resume1.getContacts().put(ContactType.EMAIL, "yuriy@gmail.com");
+        Resume1.getSections().put(SectionType.OBJECTIVE, new TextSection("Java Developer"));
+        Resume1.getSections().put(SectionType.PERSONAL, new TextSection("Личные качества . . ."));
+        Resume1.getSections().put(SectionType.ACHIEVEMENT, new ListSection(List.of("Достежение 1", "Достижение 2", "Достижение 3")));
+        Resume1.getSections().put(SectionType.QUALIFICATIONS, new ListSection(List.of("Version control: . . .", "JEE AS: . . .",
+                "DB: . . .", " Languages: . . .", "Java Frameworks: . . .")));
+        Resume1.getSections().put(SectionType.EXPERIENCE, new OrganizationSection(List.of(new Organization("Name1", "https://Name2",
+                new Organization.Position(2020, Month.OCTOBER, 2022, Month.APRIL, "Title", "Description"
+                )), new Organization("Name2", "https://Name2", new Organization.Position(
+                2022, Month.MAY, "Title", "Description")))));
+        Resume1.getSections().put(SectionType.EDUCATION, new OrganizationSection(List.of(new Organization("Name3", "https://Name3",
+                new Organization.Position(2013, Month.SEPTEMBER, 2018, Month.JULY, "Title", null),
+                new Organization.Position(2018, Month.SEPTEMBER, 2020, Month.AUGUST, "Title", null)))));
     }
 
     @Test
@@ -76,7 +92,7 @@ import static org.junit.jupiter.api.Assertions.*;
     @Test
     public void getAllSorted() throws Exception {
         storage.save(Resume4);
-       List<Resume> resumes = storage.getAllSorted();
+        List<Resume> resumes = storage.getAllSorted();
         assertEquals(Resume2, resumes.get(0)); // uuid2 Name1
         assertEquals(Resume4, resumes.get(1)); // uuid4 Name1
         assertEquals(Resume3, resumes.get(2)); // uuid3 Name2
