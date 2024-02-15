@@ -4,6 +4,7 @@ import come.urise.webapp.exception.ExistStorageException;
 import come.urise.webapp.exception.NotExitStorageException;
 import come.urise.webapp.model.Resume;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -11,7 +12,7 @@ public abstract class AbstractStorage<SK> implements Storage {
 
     private static final Logger LOG = Logger.getLogger(AbstractStorage.class.getName());
 
-    public Resume get(String uuid) {
+    public Resume get(String uuid) throws IOException {
         LOG.info("Get " + uuid);
         SK searchKey = getNotExistedSearchKey(uuid);
         return doGet(searchKey);
@@ -56,7 +57,7 @@ public abstract class AbstractStorage<SK> implements Storage {
     }
 
     @Override
-    public List<Resume> getAllSorted() {
+    public List<Resume> getAllSorted() throws IOException {
         LOG.info("AllSorted");
         List<Resume> list = doCopyAll();
         list.sort((o1, o2) -> {
@@ -69,13 +70,13 @@ public abstract class AbstractStorage<SK> implements Storage {
         return list;
     }
 
-    protected abstract List<Resume> doCopyAll();
+    protected abstract List<Resume> doCopyAll() throws IOException;
 
     protected abstract SK getSearchKey(String uuid);
 
     protected abstract boolean isExit(SK key);
 
-    protected abstract Resume doGet(SK searchKey);
+    protected abstract Resume doGet(SK searchKey) throws IOException;
 
     protected abstract void doSave(SK searchKey, Resume resume);
 
