@@ -6,12 +6,14 @@ import come.urise.webapp.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.time.Month;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class AbstractStorageTest {
+    protected static final File STORAGE_DIR = new File("D:\\project\\storage");
     protected Storage storage;
     protected final String UUID_1 = "uuid1";
     protected final Resume Resume1 = new Resume(UUID_1, "New Name3");
@@ -27,7 +29,7 @@ class AbstractStorageTest {
     }
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         storage.clear();
         storage.save(Resume1);
         storage.save(Resume2);
@@ -50,13 +52,13 @@ class AbstractStorageTest {
     }
 
     @Test
-    public void save() throws Exception {
+    public void save() {
         storage.save(Resume4);
         assertEquals(4, storage.size());
     }
 
     @Test
-    public void saveExist() throws Exception {
+    public void saveExist() {
         assertThrows(ExistStorageException.class, () -> storage.save(Resume1));
     }
 
@@ -64,17 +66,17 @@ class AbstractStorageTest {
     public void update() throws Exception {
         Resume resume = new Resume(UUID_1, "Name");
         storage.update(resume);
-        assertTrue(resume == storage.get(UUID_1));
+        assertTrue(resume.equals(storage.get(UUID_1)));
     }
 
     @Test
-    public void delete() throws Exception {
+    public void delete() {
         storage.delete(UUID_1);
         assertEquals(2, storage.size());
     }
 
     @Test
-    public void deleteNotExit() throws Exception {
+    public void deleteNotExit() {
         assertThrows(NotExitStorageException.class, () -> storage.delete("uuid19"));
     }
 
@@ -85,7 +87,7 @@ class AbstractStorageTest {
     }
 
     @Test
-    public void getNotExit() throws Exception {
+    public void getNotExit() {
         assertThrows(NotExitStorageException.class, () -> storage.get("uuid19"));
     }
 
@@ -100,13 +102,13 @@ class AbstractStorageTest {
     }
 
     @Test
-    public void clear() throws Exception {
+    public void clear() {
         storage.clear();
         assertEquals(0, storage.size());
     }
 
     @Test
-    public void size() throws Exception {
+    public void size() {
         assertEquals(3, storage.size());
     }
 }
