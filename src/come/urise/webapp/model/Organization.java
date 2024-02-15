@@ -1,5 +1,6 @@
 package come.urise.webapp.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Arrays;
@@ -9,7 +10,7 @@ import java.util.Objects;
 import static come.urise.webapp.util.DateUtil.NOW;
 import static come.urise.webapp.util.DateUtil.of;
 
-public class Organization {
+public class Organization implements Serializable {
     private final Link homePage;
     private final List<Position> positions;
 
