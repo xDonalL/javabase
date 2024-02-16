@@ -14,14 +14,14 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     protected abstract Resume doRead(InputStream is) throws IOException;
 
-    public AbstractFileStorage(File directory) {
+    public AbstractFileStorage(String dir) {
+        directory = new File(dir);
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not directory");
         }
         if (!directory.canRead() || !directory.canWrite()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not writable/readable");
         }
-        this.directory = directory;
     }
 
     @Override

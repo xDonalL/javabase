@@ -40,7 +40,7 @@ public class Organization implements Serializable {
         return Objects.hash(homePage, positions);
     }
 
-    public static class Position {
+    public static class Position implements Serializable {
         private final LocalDate startDate;
         private final LocalDate endDate;
         private final String title;
@@ -56,11 +56,11 @@ public class Organization implements Serializable {
             this.description = description;
         }
 
-        public Position(int startYear, Month startMonth, int endYear, Month endMonth, String title, String description){
+        public Position(int startYear, Month startMonth, int endYear, Month endMonth, String title, String description) {
             this(of(startYear, startMonth), of(endYear, endMonth), title, description);
         }
 
-        public Position(int startYear, Month startMonth, String title, String description){
+        public Position(int startYear, Month startMonth, String title, String description) {
             this(of(startYear, startMonth), NOW, title, description);
         }
 

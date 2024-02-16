@@ -1,8 +1,6 @@
 package come.urise.webapp.model;
 
-import java.io.Serializable;
-
-public enum ContactType implements Serializable {
+public enum ContactType {
     PHONE("Тел."),
     EMAIL("Почта"),
     DISCORD("Discord"),

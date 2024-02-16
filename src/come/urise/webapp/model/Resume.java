@@ -39,7 +39,7 @@ public class Resume implements Comparable<Resume>, Serializable {
 
     @Override
     public String toString() {
-        return uuid;
+        return uuid + " : " + fullName;
     }
 
     @Override

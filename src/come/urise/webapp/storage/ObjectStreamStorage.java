@@ -7,7 +7,7 @@ import java.io.*;
 
 public class ObjectStreamStorage extends AbstractFileStorage {
 
-    public ObjectStreamStorage(File file) {
+    public ObjectStreamStorage(String file) {
         super(file);
     }
 
