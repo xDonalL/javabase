@@ -28,7 +28,7 @@ class AbstractStorageTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
         storage.clear();
         storage.save(Resume1);
         storage.save(Resume2);
@@ -36,7 +36,7 @@ class AbstractStorageTest {
     }
 
     @Test
-    public void save() {
+    public void save() throws Exception{
         Resume4.getContacts().put(ContactType.PHONE, "+79622229933");
         Resume4.getContacts().put(ContactType.DISCORD, "@donal5962");
         Resume4.getContacts().put(ContactType.EMAIL, "yuriy@gmail.com");
@@ -101,7 +101,7 @@ class AbstractStorageTest {
     }
 
     @Test
-    public void clear() {
+    public void clear() throws Exception {
         storage.clear();
         assertEquals(0, storage.size());
     }
