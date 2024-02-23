@@ -5,6 +5,7 @@ import come.urise.webapp.exception.NotExitStorageException;
 import come.urise.webapp.model.Resume;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -60,13 +61,7 @@ public abstract class AbstractStorage<SK> implements Storage {
     public List<Resume> getAllSorted() throws IOException {
         LOG.info("AllSorted");
         List<Resume> list = doCopyAll();
-        list.sort((o1, o2) -> {
-            int result = o1.getFullName().compareTo(o2.getFullName());
-            if (result == 0) {
-                return o1.getUuid().compareTo(o2.getUuid());
-            }
-            return result;
-        });
+        Collections.sort(list);
         return list;
     }
 
