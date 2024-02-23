@@ -3,7 +3,10 @@ package come.urise.webapp.model;
 import java.util.Objects;
 
 public class TextSection extends Section {
-    private final String content;
+    private String content;
+
+    public TextSection() {
+    }
 
     public TextSection(String text) {
         Objects.requireNonNull(text, "text must not be null");

@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -22,7 +23,6 @@ public class PathStorage extends AbstractStorage<Path> {
         Objects.requireNonNull(dir, "directory cannot be null");
         this.streamSerializer = streamSerializer;
         directory = Paths.get(dir);
-        Objects.requireNonNull(directory, "directory must not be null");
         if (!Files.isWritable(directory) || !Files.isReadable(directory)) {
             throw new IllegalArgumentException(directory.getFileName() + " is not writable/readable");
         }
@@ -87,7 +87,7 @@ public class PathStorage extends AbstractStorage<Path> {
 
     @Override
     protected List<Resume> doCopyAll() {
-        return getFilesList().map(this::doGet).toList();
+        return getFilesList().map(this::doGet).collect(Collectors.toList());
     }
 
     private Stream<Path> getFilesList() {
