@@ -1,6 +1,6 @@
 package come.urise.webapp.model;
 
-import come.urise.webapp.util.LocalDateAdapter;
+import come.urise.webapp.util.XmlLocalDateAdapter;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -54,9 +54,9 @@ public class Organization implements Serializable {
         public Position() {
         }
 
-        @XmlJavaTypeAdapter(LocalDateAdapter.class)
+        @XmlJavaTypeAdapter(XmlLocalDateAdapter.class)
         private LocalDate startDate;
-        @XmlJavaTypeAdapter(LocalDateAdapter.class)
+        @XmlJavaTypeAdapter(XmlLocalDateAdapter.class)
         private LocalDate endDate;
         private String title;
         private String description;

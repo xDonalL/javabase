@@ -9,7 +9,7 @@ public enum ContactType {
     STATCKOVERFLOW("Профиль Stackoverflow"),
     LINKEDIN("Профиль LinkedIn");
 
-    String title;
+    final String title;
 
     ContactType(String title) {
         this.title = title;
