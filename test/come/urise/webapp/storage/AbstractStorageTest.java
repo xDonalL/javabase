@@ -15,13 +15,13 @@ class AbstractStorageTest {
     protected static final String STORAGE_DIR = "D:\\project\\storage";
     protected Storage storage;
     protected final String UUID_1 = "uuid1";
-    protected final Resume Resume1 = new Resume(UUID_1, "Name1");
+    protected final Resume resume1 = new Resume(UUID_1, "Name1");
     protected final String UUID_2 = "uuid2";
-    protected final Resume Resume2 = new Resume(UUID_2, "Name2");
+    protected final Resume resume2 = new Resume(UUID_2, "Name2");
     protected final String UUID_3 = "uuid3";
-    protected final Resume Resume3 = new Resume(UUID_3, "Name3");
+    protected final Resume resume3 = new Resume(UUID_3, "Name3");
     protected final String UUID_4 = "uuid4";
-    protected final Resume Resume4 = new Resume(UUID_4, "Name1");
+    protected final Resume resume4 = new Resume(UUID_4, "Name1");
 
     protected AbstractStorageTest(Storage storage) {
         this.storage = storage;
@@ -30,35 +30,35 @@ class AbstractStorageTest {
     @BeforeEach
     public void setUp() throws Exception {
         storage.clear();
-        Resume1.getContacts().put(ContactType.PHONE, "+79622229933");
-        Resume1.getContacts().put(ContactType.DISCORD, "@donal5962");
-        Resume1.getContacts().put(ContactType.EMAIL, "yuriy@gmail.com");
-        Resume1.getSections().put(SectionType.OBJECTIVE, new TextSection("Java Developer"));
-        Resume1.getSections().put(SectionType.PERSONAL, new TextSection("Личные качества . . ."));
-        Resume1.getSections().put(SectionType.ACHIEVEMENT, new ListSection(List.of("Достежение 1", "Достижение 2", "Достижение 3")));
-        Resume1.getSections().put(SectionType.QUALIFICATIONS, new ListSection(List.of("Version control: . . .", "JEE AS: . . .",
+        resume1.getContacts().put(ContactType.PHONE, "+79622229933");
+        resume1.getContacts().put(ContactType.DISCORD, "@donal5962");
+        resume1.getContacts().put(ContactType.EMAIL, "yuriy@gmail.com");
+        resume1.getSections().put(SectionType.OBJECTIVE, new TextSection("Java Developer"));
+        resume1.getSections().put(SectionType.PERSONAL, new TextSection("Личные качества . . ."));
+        resume1.getSections().put(SectionType.ACHIEVEMENT, new ListSection(List.of("Достижение 1", "Достижение 2", "Достижение 3")));
+        resume1.getSections().put(SectionType.QUALIFICATIONS, new ListSection(List.of("Version control: . . .", "JEE AS: . . .",
                 "DB: . . .", " Languages: . . .", "Java Frameworks: . . .")));
-        Resume1.getSections().put(SectionType.EXPERIENCE, new OrganizationSection(List.of(new Organization("Name1", "https://Name2",
+        resume1.getSections().put(SectionType.EXPERIENCE, new OrganizationSection(List.of(new Organization("Name1", "https://Name2",
                 new Organization.Position(2020, Month.OCTOBER, 2022, Month.APRIL, "Title", "Description"
                 )), new Organization("Name2", "https://Name2", new Organization.Position(
                 2022, Month.MAY, "Title", "Description")))));
-        Resume1.getSections().put(SectionType.EDUCATION, new OrganizationSection(List.of(new Organization("Name3", "https://Name3",
-                new Organization.Position(2013, Month.SEPTEMBER, 2018, Month.JULY, "Title", null),
-                new Organization.Position(2018, Month.SEPTEMBER, 2020, Month.AUGUST, "Title", null)))));
-        storage.save(Resume1);
-        storage.save(Resume2);
-        storage.save(Resume3);
+        resume1.getSections().put(SectionType.EDUCATION, new OrganizationSection(List.of(new Organization("Name3", "https://Name3",
+                new Organization.Position(2013, Month.SEPTEMBER, 2018, Month.JULY, "Title", ""),
+                new Organization.Position(2018, Month.SEPTEMBER, 2020, Month.AUGUST, "Title", "null")))));
+        storage.save(resume1);
+        storage.save(resume2);
+        storage.save(resume3);
     }
 
     @Test
     public void save() throws Exception{
-        storage.save(Resume4);
+        storage.save(resume4);
         assertEquals(4, storage.size());
     }
 
     @Test
     public void saveExist() {
-        assertThrows(ExistStorageException.class, () -> storage.save(Resume2));
+        assertThrows(ExistStorageException.class, () -> storage.save(resume2));
     }
 
     @Test
@@ -81,8 +81,9 @@ class AbstractStorageTest {
 
     @Test
     public void get() throws Exception {
-        storage.get("uuid2");
-        assertEquals("uuid2", UUID_2);
+        assertEquals(resume1, storage.get(resume1.getUuid()));
+        assertEquals(resume2, storage.get(resume2.getUuid()));
+        assertEquals(resume3, storage.get(resume3.getUuid()));
     }
 
     @Test
@@ -92,12 +93,12 @@ class AbstractStorageTest {
 
     @Test
     public void getAllSorted() throws Exception {
-        storage.save(Resume4);
+        storage.save(resume4);
         List<Resume> list = storage.getAllSorted();
-        assertEquals(Resume1, list.get(0)); // uuid1 Name1
-        assertEquals(Resume4, list.get(1)); // uuid4 Name1
-        assertEquals(Resume2, list.get(2)); // uuid2 Name2
-        assertEquals(Resume3, list.get(3)); // uuid3 Name3
+        assertEquals(resume1, list.get(0)); // uuid1 Name1
+        assertEquals(resume4, list.get(1)); // uuid4 Name1
+        assertEquals(resume2, list.get(2)); // uuid2 Name2
+        assertEquals(resume3, list.get(3)); // uuid3 Name3
     }
 
     @Test
