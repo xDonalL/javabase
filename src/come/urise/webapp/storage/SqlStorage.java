@@ -2,14 +2,13 @@ package come.urise.webapp.storage;
 
 import come.urise.webapp.exception.NotExitStorageException;
 import come.urise.webapp.exception.StorageException;
+import come.urise.webapp.model.ContactType;
 import come.urise.webapp.model.Resume;
 import come.urise.webapp.sql.SqlHelper;
 
 import java.io.IOException;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.*;
+import java.util.*;
 
 public class SqlStorage implements Storage {
 
@@ -26,38 +25,50 @@ public class SqlStorage implements Storage {
 
     @Override
     public void save(Resume r) {
-        sqlHelper.<Void>execute("INSERT INTO resume VALUES (?, ?)",
-                statement -> {
-                    statement.setString(1, r.getUuid());
-                    statement.setString(2, r.getFullName());
-                     statement.execute();
-                     return null;
+        sqlHelper.executeTransaction(connection -> {
+            try (PreparedStatement ps = connection.prepareStatement("INSERT INTO resume VALUES (?, ?)")) {
+                ps.setString(1, r.getUuid());
+                ps.setString(2, r.getFullName());
+                ps.execute();
+            }
+            insertContact(connection, r);
         });
-
     }
-
 
     @Override
     public void update(Resume r) {
-        sqlHelper.<Void>execute("UPDATE resume SET full_name = ? WHERE uuid = ?",
-                statement -> {
-                    statement.setString(1, r.getFullName());
-                    statement.setString(2, r.getUuid());
-                     statement.execute();
-                     return null;
-                });
+        sqlHelper.executeTransaction(connection -> {
+            try (PreparedStatement ps = connection.prepareStatement("UPDATE resume SET full_name = ? WHERE uuid = ?")) {
+                ps.setString(1, r.getFullName());
+                ps.setString(2, r.getUuid());
+                ps.execute();
+                if (ps.executeUpdate() != 1) {
+                    throw new NotExitStorageException(r.getUuid());
+                }
+            }
+            deleteContact(connection, r);
+            insertContact(connection, r);
+        });
     }
 
     @Override
     public Resume get(String uuid) throws IOException {
-        return sqlHelper.execute("SELECT * FROM resume WHERE uuid = ?",
+        return sqlHelper.execute("" +
+                        "SELECT * FROM resume r " +
+                        "LEFT JOIN contact c " +
+                        "ON (r.uuid = c.resume_uuid) " +
+                        "WHERE r.uuid = ?",
                 statement -> {
                     statement.setString(1, uuid);
                     ResultSet rs = statement.executeQuery();
                     if (!rs.next()) {
-                        throw new NotExitStorageException("Invalid " + uuid);
+                        throw new NotExitStorageException(uuid);
                     }
-                    return new Resume(uuid, rs.getString("full_name").trim());
+                    Resume r = new Resume(uuid, rs.getString("full_name").trim());
+                    do {
+                        addContact(rs, r);
+                    } while (rs.next());
+                    return r;
                 });
     }
 
@@ -73,18 +84,25 @@ public class SqlStorage implements Storage {
                 });
     }
 
-
     @Override
     public List<Resume> getAllSorted() {
-        return sqlHelper.<List<Resume>>execute("SELECT * FROM resume ORDER BY full_name, uuid",
-                statement -> {
-                    ArrayList<Resume> list = new ArrayList<>();
-                    ResultSet rs = statement.executeQuery();
-                    while (rs.next()) {
-                        list.add(new Resume(rs.getString("uuid").trim(), rs.getString("full_name").trim()));
-                    }
-                    return list;
-                });
+        return sqlHelper.execute("" +
+                "   SELECT * FROM resume r " +
+                "LEFT JOIN contact c ON r.uuid = c.resume_uuid " +
+                "ORDER BY full_name, uuid", ps -> {
+            ResultSet rs = ps.executeQuery();
+            Map<String, Resume> map = new LinkedHashMap<>();
+            while (rs.next()) {
+                String uuid = rs.getString("uuid");
+                Resume r = map.get(uuid);
+                if (r == null) {
+                    r = new Resume(uuid, rs.getString("full_name").trim());
+                    map.put(uuid, r);
+                }
+                addContact(rs, r);
+            }
+            return new ArrayList<>(map.values());
+        });
     }
 
     @Override
@@ -98,5 +116,35 @@ public class SqlStorage implements Storage {
                     return rs.getInt("size");
                 });
     }
-}
 
+    private void insertContact(Connection connection, Resume r) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement("" +
+                "INSERT INTO contact(resume_uuid, type, value) " +
+                "VALUES (?, ?, ?)")) {
+            for (Map.Entry<ContactType, String> entry : r.getContacts().entrySet()) {
+                ps.setString(1, r.getUuid());
+                ps.setString(2, entry.getKey().name());
+                ps.setString(3, entry.getValue());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+
+    private void deleteContact(Connection connection, Resume r) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement("" +
+                "DELETE FROM contact " +
+                "WHERE resume_uuid = ?")) {
+            ps.setString(1, r.getUuid());
+            ps.execute();
+        }
+    }
+
+    private void addContact(ResultSet rs, Resume r) throws SQLException {
+        String value = rs.getString("value");
+        if (value != null) {
+            ContactType type = ContactType.valueOf(rs.getString("type"));
+            r.addContacts(type, value);
+        }
+    }
+}
