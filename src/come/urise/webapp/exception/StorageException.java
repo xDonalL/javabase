@@ -7,6 +7,10 @@ public class StorageException extends RuntimeException {
         this(massage, uuid, null);
     }
 
+    public StorageException(Exception e) {
+        this(null, null, e);
+    }
+
     public StorageException(String massage) {
         this(massage, null, null);
     }

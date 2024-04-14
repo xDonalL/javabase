@@ -1,5 +1,7 @@
 package come.urise.webapp.sql;
 
+import come.urise.webapp.exception.StorageException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -27,6 +29,21 @@ public class SqlHelper {
             return statement.executor(ps);
         } catch (SQLException e) {
             throw ExceptionUtil.convertException(e);
+        }
+    }
+
+    public void executeTransaction(SqlTransaction statement) {
+        try (Connection con = connectionFactory.getConnect()) {
+            try {
+                con.setAutoCommit(false);
+                statement.executeTransaction(con);
+                con.commit();
+            } catch (SQLException e) {
+                con.rollback();
+                throw ExceptionUtil.convertException(e);
+            }
+        } catch (SQLException e) {
+            throw new StorageException(e);
         }
     }
 }
