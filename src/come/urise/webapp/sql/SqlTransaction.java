@@ -4,5 +4,5 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public interface SqlTransaction<T> {
-    void executeTransaction(Connection connection) throws SQLException;
+    T executeTransaction(Connection connection) throws SQLException;
 }
