@@ -2,14 +2,18 @@ package come.urise.webapp.storage;
 
 import come.urise.webapp.exception.NotExitStorageException;
 import come.urise.webapp.exception.StorageException;
-import come.urise.webapp.model.*;
+import come.urise.webapp.model.ContactType;
+import come.urise.webapp.model.Resume;
+import come.urise.webapp.model.Section;
+import come.urise.webapp.model.SectionType;
 import come.urise.webapp.sql.SqlHelper;
+import come.urise.webapp.util.JsonParser;
 
 import java.io.IOException;
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class SqlStorage implements Storage {
 
@@ -90,9 +94,6 @@ public class SqlStorage implements Storage {
                         addSection(rs, r);
                     } while (rs.next());
                 }
-                System.out.println(r.getUuid());
-                System.out.println(r.getContacts());
-                System.out.println(r.getSections());
             }
             return r;
         });
@@ -114,19 +115,19 @@ public class SqlStorage implements Storage {
     public List<Resume> getAllSorted() {
         List<Resume> resumes = new ArrayList<>();
         return sqlHelper.execute(
-                    "SELECT * FROM resume " +
-                            "ORDER BY full_name, uuid", ps ->  {
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    resumes.add(new Resume(rs.getString("uuid"), rs.getString("full_name")));
-                }
-            List<Resume> result = new ArrayList<>();
-            for (Resume r : resumes) {
-                Resume resume =  get(r.getUuid());
-                result.add(resume);
-            }
-            return result;
-        });
+                "SELECT * FROM resume " +
+                        "ORDER BY full_name, uuid", ps ->  {
+                    ResultSet rs = ps.executeQuery();
+                    while (rs.next()) {
+                        resumes.add(new Resume(rs.getString("uuid"), rs.getString("full_name").trim()));
+                    }
+                    List<Resume> result = new ArrayList<>();
+                    for (Resume r : resumes) {
+                        Resume resume =  get(r.getUuid());
+                        result.add(resume);
+                    }
+                    return result;
+                });
     }
 
     @Override
@@ -149,36 +150,12 @@ public class SqlStorage implements Storage {
             for (Map.Entry<SectionType, Section> entry : sections.entrySet()) {
                 ps.setString(1, r.getUuid());
                 ps.setString(2, entry.getKey().name());
-                ps.setString(3, sectionValue(entry));
+                Section section = entry.getValue();
+                ps.setString(3, JsonParser.write(section, Section.class));
                 ps.addBatch();
             }
             ps.executeBatch();
         }
-    }
-
-    private String sectionValue(Map.Entry<SectionType, Section> entry) {
-        StringBuilder result = new StringBuilder();
-        if (entry.getKey() == SectionType.PERSONAL || entry.getKey() == SectionType.OBJECTIVE) {
-            result.append(entry.getValue().toString());
-        }
-        if (entry.getKey() == SectionType.ACHIEVEMENT || entry.getKey() == SectionType.QUALIFICATIONS) {
-            for (String s : ((ListSection) entry.getValue()).getItems()) {
-                result.append(s).append("\n");
-            }
-        }
-        if (entry.getKey() == SectionType.EXPERIENCE || entry.getKey() == SectionType.EDUCATION) {
-            List<Organization> organizations = ((OrganizationSection) entry.getValue()).getOrganizations();
-            for (Organization organization : organizations) {
-                result.append(organization.getHomePage().getName() + "\n");
-                result.append(organization.getHomePage().getUrl() + "\n");
-                for (Organization.Position position : organization.getPositions()) {
-                    result.append(position.getStartDate() + "\n" + position.getEndDate() + "\n");
-                    result.append(position.getTitle() + "\n");
-                    result.append(position.getDescription() + "\n");
-                }
-            }
-        }
-        return result.toString();
     }
 
     private void insertContact(Connection connection, Resume r) throws SQLException {
@@ -196,18 +173,20 @@ public class SqlStorage implements Storage {
     }
 
     private void deleteSection(Connection connection, Resume r) throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement(
+        deleteAttributes(connection, r,
                 "DELETE FROM sections " +
-                        "WHERE resume_uuid = ?")) {
-            ps.setString(1, r.getUuid());
-            ps.execute();
-        }
+                        "WHERE resume_uuid = ?");
     }
 
     private void deleteContact(Connection connection, Resume r) throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement(
+        deleteAttributes(connection, r,
                 "DELETE FROM contact " +
-                        "WHERE resume_uuid = ?")) {
+                        "WHERE resume_uuid = ?");
+    }
+
+    private void deleteAttributes(Connection connection, Resume r, String sql) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(
+                sql)) {
             ps.setString(1, r.getUuid());
             ps.execute();
         }
@@ -225,32 +204,7 @@ public class SqlStorage implements Storage {
         String value = rs.getString("value");
         if (value != null) {
             SectionType type = SectionType.valueOf(rs.getString("type"));
-            if (type == SectionType.PERSONAL || type == SectionType.OBJECTIVE) {
-                TextSection ts = new TextSection(value);
-                r.addSections(type, ts);
-            }
-            if (type == SectionType.ACHIEVEMENT || type == SectionType.QUALIFICATIONS) {
-                String[] strings = value.split("\n");
-                List<String> list = new ArrayList<>(Arrays.asList(strings));
-                ListSection ls = new ListSection(list);
-                r.addSections(type, ls);
-            }
-            if (type == SectionType.EXPERIENCE || type == SectionType.EDUCATION) {
-                addContacts(r, value,type);
-            }
+            r.addSections(type, JsonParser.read(value, Section.class));
         }
-    }
-
-    private void addContacts(Resume r, String value, SectionType type) throws SQLException {
-        List<Organization> list = new ArrayList<>();
-        String[] strings = value.split("\n");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        for (int i = 0; i < strings.length; i = i + 6) {
-            Organization.Position position = new Organization.Position(
-                    LocalDate.parse(strings[2 + i], formatter), LocalDate.parse(strings[3 + i], formatter), strings[4 + i], strings[5 + i]);
-            Organization organization = new Organization(strings[i], strings[1 + i], position);
-            list.add(organization);
-        }
-        r.addSections(type, new OrganizationSection(list));
     }
 }
