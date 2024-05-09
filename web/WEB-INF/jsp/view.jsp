@@ -16,7 +16,7 @@
         <c:forEach var="contactEntry" items="${resume.contacts}">
             <jsp:useBean id="contactEntry"
                          type="java.util.Map.Entry<come.urise.webapp.model.ContactType, java.lang.String>"/>
-            <%=contactEntry.getKey().toHtml(contactEntry.getValue())%>
+            <%=HtmlUtil.toFormatedContacts(contactEntry.getKey(), contactEntry.getValue())%>
             </br>
         </c:forEach>
     </p>
