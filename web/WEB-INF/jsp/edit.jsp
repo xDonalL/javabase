@@ -1,6 +1,8 @@
 <%@ page import="come.urise.webapp.model.*" %>
 <%@ page import="come.urise.webapp.util.HtmlUtil" %>
 <%@ page import="come.urise.webapp.util.DateUtil" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
@@ -36,18 +38,33 @@
             switch (sectionType) {
                 case OBJECTIVE:
                 case PERSONAL:
+                    if (resume.getSections().get(sectionType) == null) {
+        %>
+
+        <textarea name='<%=sectionType.name()%>' cols=75
+                  rows=5 placeholder="<%=sectionType.getTitle()%>"><%=""%></textarea>
+        <%
+        } else {
         %>
         <textarea name='<%=sectionType.name()%>' cols=75
                   rows=5><%=resume.getSections().get(sectionType)%></textarea>
         <%
-            break;
+                }
+                break;
             case ACHIEVEMENT:
             case QUALIFICATIONS:
+                if (resume.getSections().get(sectionType) == null) {
         %>
         <textarea name="<%=sectionType.name()%>" cols=75
-                  rows=5><%=String.join("\n",((ListSection)resume.getSections().get(sectionType)).getItems())%></textarea>
+                  rows=5 placeholder="<%=sectionType.getTitle()%>"><%=""%></textarea>
         <%
-            break;
+        } else {
+        %>
+        <textarea name="<%=sectionType.name()%>" cols=75
+                  rows=5><%=String.join("\n", ((ListSection) resume.getSections().get(sectionType)).getItems())%></textarea>
+        <%
+                }
+                break;
             case EXPERIENCE:
             case EDUCATION:
                 for (Organization org : ((OrganizationSection) resume.getSections().get(sectionType)).getOrganizations()) {
@@ -95,7 +112,7 @@
                             counter++;
                         }
                 }
-        }
+            }
         %>
         <button type="submit">Сохранить</button>
         <button onclick="window.history.back()">Отменить</button>
