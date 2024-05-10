@@ -4,6 +4,7 @@ import come.urise.webapp.Config;
 import come.urise.webapp.model.*;
 import come.urise.webapp.storage.Storage;
 import come.urise.webapp.util.DateUtil;
+import come.urise.webapp.util.HtmlUtil;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -33,21 +34,41 @@ public class ResumeServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/jsp/list.jsp").forward(request, response);
         }
         Resume r;
-        switch (action) {
-            case "delete":
-                storage.delete(uuid);
-                response.sendRedirect("resume");
-                return;
-            case "view":
-            case "edit":
-                r = storage.get(uuid);
-                break;
-            default:
-                throw new javax.servlet.ServletException("Invalid action: " + action);
+        if (action != null) {
+            switch (action) {
+                case "delete":
+                    storage.delete(uuid);
+                    response.sendRedirect("resume");
+                    return;
+                case "edit":
+                    r = storage.get(uuid);
+                    for (SectionType type : new SectionType[]{SectionType.EXPERIENCE, SectionType.EDUCATION}) {
+                        OrganizationSection section = (OrganizationSection) r.getSections().get(type);
+                        List<Organization> emptyFirstOrganizations = new ArrayList<>();
+                        emptyFirstOrganizations.add(Organization.EMPTY);
+                        if (section != null) {
+                            for (Organization org : section.getOrganizations()) {
+                                List<Organization.Position> emptyFirstPositions = new ArrayList<>();
+                                emptyFirstPositions.add(Organization.Position.EMPTY);
+                                emptyFirstPositions.addAll(org.getPositions());
+                                Organization.Position[] emptyFirstPosition = emptyFirstPositions.toArray(
+                                        new Organization.Position[emptyFirstPositions.size()]);
+                                emptyFirstOrganizations.add(new Organization(org.getHomePage(), emptyFirstPosition));
+                            }
+                        }
+                        r.addSections(type, new OrganizationSection(emptyFirstOrganizations));
+                    }
+                    break;
+                case "view":
+                    r = storage.get(uuid);
+                    break;
+                default:
+                    throw new javax.servlet.ServletException("Invalid action: " + action);
+            }
+            request.setAttribute("resume", r);
+            request.getRequestDispatcher("view".equals(action) ? "/WEB-INF/jsp/view.jsp" : "/WEB-INF/jsp/edit.jsp")
+                    .forward(request, response);
         }
-        request.setAttribute("resume", r);
-        request.getRequestDispatcher("view".equals(action) ? "/WEB-INF/jsp/view.jsp" : "/WEB-INF/jsp/edit.jsp")
-                .forward(request, response);
     }
 
     @Override
@@ -59,7 +80,7 @@ public class ResumeServlet extends HttpServlet {
         r.setFullName(fullName);
         for (ContactType type : ContactType.values()) {
             String value = request.getParameter(type.name());
-            if (value != null && value.trim().length() != 0) {
+            if (!HtmlUtil.isEmpty(value)) {
                 r.addContacts(type, value);
             } else {
                 r.getContacts().remove(type);
@@ -68,7 +89,7 @@ public class ResumeServlet extends HttpServlet {
         for (SectionType type : SectionType.values()) {
             String value = request.getParameter(type.name());
             String[] values = request.getParameterValues(type.name());
-            if (value != null && value.trim().length() == 0 && values.length < 2) {
+            if (HtmlUtil.isEmpty(value) && values.length < 2) {
                 r.getSections().remove(type);
             } else {
                 switch (type) {
@@ -86,7 +107,7 @@ public class ResumeServlet extends HttpServlet {
                         String[] urls = request.getParameterValues(type.name() + "url");
                         for (int i = 0; i < values.length; i++) {
                             String name = values[i];
-                            if (name != null && name.trim().length() != 0) {
+                            if (!HtmlUtil.isEmpty(name)) {
                                 List<Organization.Position> positions = new ArrayList<>();
                                 String pfx = type.name() + i;
                                 String[] titles = request.getParameterValues(pfx + "title");
@@ -94,7 +115,7 @@ public class ResumeServlet extends HttpServlet {
                                 String[] endDates = request.getParameterValues(pfx + "endDate");
                                 String[] descriptions = request.getParameterValues(pfx + "description");
                                 for (int j = 0; j < titles.length; j++) {
-                                    if (titles[j] != null && titles[j].trim().length() != 0) {
+                                    if (!HtmlUtil.isEmpty(titles[j])) {
                                         positions.add(new Organization.Position(DateUtil.parse(startDates[j]), DateUtil.parse(endDates[j]), titles[j], descriptions[j]));
                                     }
                                 }

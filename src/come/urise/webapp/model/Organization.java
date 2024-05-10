@@ -5,6 +5,7 @@ import come.urise.webapp.util.XmlLocalDateAdapter;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Month;
@@ -17,6 +18,11 @@ import static come.urise.webapp.util.DateUtil.of;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Organization implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    public static final Organization EMPTY = new Organization("", "", Position.EMPTY);
+
     private Link homePage;
     private List<Position> positions;
 
@@ -35,6 +41,13 @@ public class Organization implements Serializable {
         this.homePage = new Link(name, url);
         this.positions = Arrays.asList(position);
     }
+
+    public Organization(Link homePage, Position... position) {
+        this.homePage = homePage;
+        this.positions = Arrays.asList(position);
+    }
+
+
 
     @Override
     public String toString() {
@@ -59,6 +72,9 @@ public class Organization implements Serializable {
 
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Position implements Serializable {
+
+        public static final Position EMPTY = new Position();
+
         public Position() {
         }
 
