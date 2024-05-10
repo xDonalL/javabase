@@ -40,6 +40,9 @@ public class ResumeServlet extends HttpServlet {
                     storage.delete(uuid);
                     response.sendRedirect("resume");
                     return;
+                case "add":
+                    r = Resume.EMPTY;
+                    break;
                 case "edit":
                     r = storage.get(uuid);
                     for (SectionType type : new SectionType[]{SectionType.EXPERIENCE, SectionType.EDUCATION}) {
@@ -76,8 +79,14 @@ public class ResumeServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String uuid = request.getParameter("uuid");
         String fullName = request.getParameter("fullName");
-        Resume r = storage.get(uuid);
-        r.setFullName(fullName);
+        boolean isCreate = HtmlUtil.isEmpty(uuid);
+        Resume r;
+        if (isCreate) {
+            r = new Resume(fullName);
+        } else {
+            r = storage.get(uuid);
+            r.setFullName(fullName);
+        }
         for (ContactType type : ContactType.values()) {
             String value = request.getParameter(type.name());
             if (!HtmlUtil.isEmpty(value)) {
@@ -127,7 +136,14 @@ public class ResumeServlet extends HttpServlet {
                 }
             }
         }
-        storage.update(r);
+        if (isCreate) {
+            storage.save(r);
+        } else {
+            storage.update(r);
+        }
+        if (HtmlUtil.isEmpty(r.getFullName())) {
+            storage.delete(r.getUuid());
+        }
         response.sendRedirect("resume");
     }
 }

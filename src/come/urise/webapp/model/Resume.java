@@ -5,9 +5,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static java.util.UUID.randomUUID;
 
@@ -16,6 +14,17 @@ import static java.util.UUID.randomUUID;
 public class Resume implements Comparable<Resume>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+
+    public static final Resume EMPTY = new Resume();
+
+    static {
+        EMPTY.addSections(SectionType.OBJECTIVE, TextSection.EMPTY);
+        EMPTY.addSections(SectionType.PERSONAL, TextSection.EMPTY);
+        EMPTY.addSections(SectionType.ACHIEVEMENT, ListSection.EMPTY);
+        EMPTY.addSections(SectionType.QUALIFICATIONS, ListSection.EMPTY);
+        EMPTY.addSections(SectionType.EXPERIENCE, new OrganizationSection(List.of(Organization.EMPTY)));
+        EMPTY.addSections(SectionType.EDUCATION, new OrganizationSection(List.of(Organization.EMPTY)));
+    }
 
     private String uuid;
 

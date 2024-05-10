@@ -3,6 +3,9 @@ package come.urise.webapp.model;
 import java.util.Objects;
 
 public class TextSection extends Section {
+
+    public static final TextSection EMPTY = new TextSection("");
+
     private String content;
 
     public TextSection() {
