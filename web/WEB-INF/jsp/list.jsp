@@ -1,4 +1,5 @@
 <%@ page import="come.urise.webapp.model.ContactType" %>
+<%@ page import="come.urise.webapp.Config" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
@@ -45,9 +46,11 @@
                             </a>
                         </td>
                         <td class="img-column">
+                            <c:if test="${!Config.get().isImmutable(resume.uuid)}">
                                 <a class="no-underline-anchor" href="resume?uuid=${resume.uuid}&action=delete">
                                     <img src="img/remove.svg" alt="">
                                 </a>
+                            </c:if>
                         </td>
                     </tr>
                 </c:forEach>

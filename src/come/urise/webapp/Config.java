@@ -47,4 +47,8 @@ public class Config {
         }
         return homeDir;
     }
+
+    public boolean isImmutable(String uuid) {
+        return uuid.equals("29e519ae-0a53-471c-8c00-9dc9dd15e0be");
+    }
 }

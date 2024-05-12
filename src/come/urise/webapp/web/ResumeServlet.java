@@ -37,7 +37,9 @@ public class ResumeServlet extends HttpServlet {
         if (action != null) {
             switch (action) {
                 case "delete":
-                    storage.delete(uuid);
+                    if(!Config.get().isImmutable(uuid)) {
+                        storage.delete(uuid);
+                    }
                     response.sendRedirect("resume");
                     return;
                 case "add":
@@ -139,7 +141,9 @@ public class ResumeServlet extends HttpServlet {
         if (isCreate) {
             storage.save(r);
         } else {
+            if (!Config.get().isImmutable(uuid)) {
             storage.update(r);
+            }
         }
         if (HtmlUtil.isEmpty(r.getFullName())) {
             storage.delete(r.getUuid());
